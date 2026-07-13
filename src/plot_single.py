@@ -10,9 +10,16 @@ from src.line_detect import detect_line_regions, assign_lines_to_channels
 
 
 _PEAK_COLORS = [
-    "#e41a1c", "#377eb8", "#4daf4a", "#984ea3",
-    "#ff7f00", "#a65628", "#f781bf", "#999999",
-    "#8dd3c7", "#fb8072",
+    "#e41a1c",
+    "#377eb8",
+    "#4daf4a",
+    "#984ea3",
+    "#ff7f00",
+    "#a65628",
+    "#f781bf",
+    "#999999",
+    "#8dd3c7",
+    "#fb8072",
 ]
 
 
@@ -63,8 +70,14 @@ def _annotate_foreground_spectrum(ax, foreground):
         # extend fill by a few pixels on each side for visibility
         fill_l = max(0, s - 2)
         fill_r = min(len(wl) - 1, e + 2)
-        ax.fill_between(wl[fill_l : fill_r + 1], 0, rad[fill_l : fill_r + 1],
-                        color=color, alpha=0.25, zorder=2)
+        ax.fill_between(
+            wl[fill_l : fill_r + 1],
+            0,
+            rad[fill_l : fill_r + 1],
+            color=color,
+            alpha=0.25,
+            zorder=2,
+        )
 
         # stagger annotation height to avoid overlaps (alternating)
         y_offset = 30 if i % 2 == 0 else 55
@@ -73,14 +86,22 @@ def _annotate_foreground_spectrum(ax, foreground):
             xy=(wl_peak, rad_peak),
             xytext=(0, y_offset),
             textcoords="offset points",
-            ha="center", va="bottom",
+            ha="center",
+            va="bottom",
             fontsize=7.5,
             color=color,
             arrowprops=dict(arrowstyle="-", color=color, lw=1.2),
-            bbox=dict(facecolor="white", alpha=0.80,
-                      boxstyle="round,pad=0.25", edgecolor=color, linewidth=1.2),
+            bbox=dict(
+                facecolor="white",
+                alpha=0.80,
+                boxstyle="round,pad=0.25",
+                edgecolor=color,
+                linewidth=1.2,
+            ),
         )
-        peak_info.append({"wl": wl_peak, "rad": rad_peak, "rad_int": rad_int, "color": color})
+        peak_info.append(
+            {"wl": wl_peak, "rad": rad_peak, "rad_int": rad_int, "color": color}
+        )
 
     return peak_info
 
@@ -88,19 +109,33 @@ def _annotate_foreground_spectrum(ax, foreground):
 def _annotate_region(ax, img, wl_v, left, right):
     """Draw ↔ arrow, wavelength width, pixel width, and centre vline on *ax*."""
     ny = img.shape[0]
-    wl_l = wl_v[left]  if left  < len(wl_v) else float("nan")
+    wl_l = wl_v[left] if left < len(wl_v) else float("nan")
     wl_r = wl_v[right] if right < len(wl_v) else float("nan")
     width_wl = abs(wl_r - wl_l)
     center = 0.5 * (left + right)
-    ax.annotate("", xy=(right, ny * 0.85), xytext=(left, ny * 0.85),
-                arrowprops=dict(arrowstyle="<->", color="k", lw=2, mutation_scale=18))
+    ax.annotate(
+        "",
+        xy=(right, ny * 0.85),
+        xytext=(left, ny * 0.85),
+        arrowprops=dict(arrowstyle="<->", color="k", lw=2, mutation_scale=18),
+    )
     ax.text(center, ny * 0.87, f"{width_wl:.3f} µm", color="k", ha="center", fontsize=8)
-    ax.text(center, ny * 0.70, f"{right - left + 1} px",  color="k", ha="center", fontsize=8)
+    ax.text(
+        center, ny * 0.70, f"{right - left + 1} px", color="k", ha="center", fontsize=8
+    )
     ax.axvline(center, color="red", linestyle="--")
 
 
-def _detect_and_annotate(ax_img, img, wl, search_img=None, threshold_factor=0.05,
-                          ax_profile=None, regions=None, profile_fill_color=None):
+def _detect_and_annotate(
+    ax_img,
+    img,
+    wl,
+    search_img=None,
+    threshold_factor=0.05,
+    ax_profile=None,
+    regions=None,
+    profile_fill_color=None,
+):
     """Annotate *regions* on *ax_img*; detects if *regions* is not provided."""
     wl_v = _wl_array(wl)
     if regions is None:
@@ -119,8 +154,15 @@ def _detect_and_annotate(ax_img, img, wl, search_img=None, threshold_factor=0.05
             # shade area under the profile for this aperture
             if profile_fill_color is not None:
                 mask = (x >= r["left"]) & (x <= r["right"])
-                ax_profile.fill_between(x, 0, profile, where=mask, interpolate=True,
-                                        color=profile_fill_color, alpha=0.25)
+                ax_profile.fill_between(
+                    x,
+                    0,
+                    profile,
+                    where=mask,
+                    interpolate=True,
+                    color=profile_fill_color,
+                    alpha=0.25,
+                )
 
 
 def _add_wl_axis(ax, wl, nx):
@@ -143,33 +185,66 @@ def _overlay_apertures(ax, masks, table=None):
         left, right = int(xs.min()), int(xs.max())
         top, bottom = int(ys.min()), int(ys.max())
         rect = mpatches.Rectangle(
-            (left, top), right - left + 1, bottom - top + 1,
-            fill=False, edgecolor="white", linewidth=1.5, linestyle="--",
+            (left, top),
+            right - left + 1,
+            bottom - top + 1,
+            fill=False,
+            edgecolor="white",
+            linewidth=1.5,
+            linestyle="--",
         )
         ax.add_patch(rect)
         if table is not None and i < len(table):
-            val = table["net_flux"][i] if "net_flux" in table.colnames else table["raw_sum"][i]
-            val2 = table["snr"][i] if "snr" in table.colnames else float("nan")
-            if val2 is not None and not np.isnan(val2):
-                text = f"ct: {val:.3e} adu\nSNR: {val2:.1f}"
-            else:                
-                text = f"ct: {val:.3e} adu"
+            if "raw_median" in table.colnames:
+                med = float(table["raw_median"][i])
+                std = float(table["raw_std"][i])
+                text = f"med: {med:.1e}\n± {std:.1e} adu"
+            elif "net_flux" in table.colnames:
+                text = f"net: {float(table['net_flux'][i]):.3e} adu"
+            else:
+                text = f"sum: {float(table['raw_sum'][i]):.3e} adu"
+            if "snr" in table.colnames:
+                snr_val = float(table["snr"][i])
+                if not np.isnan(snr_val):
+                    text += f"\nSNR: {snr_val:.1f}"
             ax.text(
-                0.5 * (left + right), 0.5 * (top + bottom), text,
-                color="k", ha="center", va="center", fontsize=9,
+                0.5 * (left + right),
+                0.5 * (top + bottom),
+                text,
+                color="k",
+                ha="center",
+                va="center",
+                fontsize=9,
                 bbox=dict(facecolor="white", alpha=0.6, boxstyle="round"),
             )
 
 
-def _plot_channel(ax_img, ax_prof, img, wl, search_img, regions, masks, table,
-                  title, threshold_factor, units, profile_fill_color,
-                  manual_wl_min=None, manual_wl_max=None, saturation_limit=None):
+def _plot_channel(
+    ax_img,
+    ax_prof,
+    img,
+    wl,
+    search_img,
+    regions,
+    masks,
+    table,
+    title,
+    threshold_factor,
+    units,
+    profile_fill_color,
+    manual_wl_min=None,
+    manual_wl_max=None,
+    saturation_limit=None,
+):
     """Render a single channel focal-plane image with apertures and profile."""
     import matplotlib.pyplot as plt
+
     ny, nx = img.shape
 
     cmap = plt.cm.viridis.copy()
-    saturated = saturation_limit is not None and float(img.max()) > float(saturation_limit)
+    saturated = saturation_limit is not None and float(img.max()) > float(
+        saturation_limit
+    )
     if saturated:
         cmap.set_over("red")
         vmax = float(saturation_limit)
@@ -182,23 +257,37 @@ def _plot_channel(ax_img, ax_prof, img, wl, search_img, regions, masks, table,
     ax_img.set_title(title, fontsize=10)
     ax_img.set_xlabel("X Pixel", fontsize=9)
     ax_img.set_ylabel("Y Pixel", fontsize=9)
-    cb = plt.colorbar(im, ax=ax_img,
-                      label=f"Intensity [{units}]" if units else "Intensity",
-                      extend=extend)
+    cb = plt.colorbar(
+        im,
+        ax=ax_img,
+        label=f"Intensity [{units}]" if units else "Intensity",
+        extend=extend,
+    )
     cb.ax.tick_params(labelsize=8)
     if saturated:
         cb.ax.annotate(
             f"sat: {saturation_limit:.0f}",
-            xy=(0.5, 1.0), xycoords="axes fraction",
-            xytext=(0, 18), textcoords="offset points",
-            ha="center", va="bottom", fontsize=7,
+            xy=(0.5, 1.0),
+            xycoords="axes fraction",
+            xytext=(0, 18),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=7,
             color="red",
             arrowprops=dict(arrowstyle="->", color="red", lw=1),
         )
     _add_wl_axis(ax_img, wl, nx)
-    _detect_and_annotate(ax_img, img, wl, search_img=search_img,
-                         threshold_factor=threshold_factor, ax_profile=ax_prof,
-                         regions=regions, profile_fill_color=profile_fill_color)
+    _detect_and_annotate(
+        ax_img,
+        img,
+        wl,
+        search_img=search_img,
+        threshold_factor=threshold_factor,
+        ax_profile=ax_prof,
+        regions=regions,
+        profile_fill_color=profile_fill_color,
+    )
     wl_v = _wl_array(wl)
 
     # If any pixels exceed the saturation limit, mark the level on the
@@ -209,44 +298,173 @@ def _plot_channel(ax_img, ax_prof, img, wl, search_img, regions, masks, table,
         # place a short label at the right edge of the profile plot
         try:
             xlim = ax_prof.get_xlim()
-            ax_prof.text(xlim[1], sat_val, f"sat {saturation_limit:.0f}",
-                         color="red", ha="right", va="bottom", fontsize=8,
-                         bbox=dict(facecolor="white", alpha=0.75, edgecolor="none"))
+            ax_prof.text(
+                xlim[1],
+                sat_val,
+                f"sat {saturation_limit:.0f}",
+                color="red",
+                ha="right",
+                va="bottom",
+                fontsize=8,
+                bbox=dict(facecolor="white", alpha=0.75, edgecolor="none"),
+            )
         except Exception:
             # in case axis limits are not yet set, skip the text annotation
             pass
     if manual_wl_min is not None:
-        val = manual_wl_min.to(u.um).value if hasattr(manual_wl_min, 'to') else float(manual_wl_min)
+        val = (
+            manual_wl_min.to(u.um).value
+            if hasattr(manual_wl_min, "to")
+            else float(manual_wl_min)
+        )
         idx = int(np.argmin(np.abs(wl_v - val)))
-        ax_img.axvline(idx, color='white', linestyle=':', linewidth=1.2)
-        ax_img.text(idx, ny * 0.96, f"{val:.2f} µm", color='white', ha='center', va='bottom', fontsize=7)
-        ax_prof.axvline(idx, color='k', linestyle=':', linewidth=1.2)
+        ax_img.axvline(idx, color="white", linestyle=":", linewidth=1.2)
+        ax_img.text(
+            idx,
+            ny * 0.96,
+            f"{val:.2f} µm",
+            color="white",
+            ha="center",
+            va="bottom",
+            fontsize=7,
+        )
+        ax_prof.axvline(idx, color="k", linestyle=":", linewidth=1.2)
     if manual_wl_max is not None:
-        val = manual_wl_max.to(u.um).value if hasattr(manual_wl_max, 'to') else float(manual_wl_max)
+        val = (
+            manual_wl_max.to(u.um).value
+            if hasattr(manual_wl_max, "to")
+            else float(manual_wl_max)
+        )
         idx = int(np.argmin(np.abs(wl_v - val)))
-        ax_img.axvline(idx, color='white', linestyle=':', linewidth=1.2)
-        ax_img.text(idx, ny * 0.96, f"{val:.2f} µm", color='white', ha='center', va='bottom', fontsize=7)
-        ax_prof.axvline(idx, color='k', linestyle=':', linewidth=1.2)
+        ax_img.axvline(idx, color="white", linestyle=":", linewidth=1.2)
+        ax_img.text(
+            idx,
+            ny * 0.96,
+            f"{val:.2f} µm",
+            color="white",
+            ha="center",
+            va="bottom",
+            fontsize=7,
+        )
+        ax_prof.axvline(idx, color="k", linestyle=":", linewidth=1.2)
     if masks:
         _overlay_apertures(ax_img, masks, table)
     ax_prof.set_xlabel("X pixel", fontsize=8)
     ax_prof.set_ylabel("Mean intensity", fontsize=8)
 
 
+# Colour palette used for individual apertures (one colour per line).
+_APERTURE_COLORS = [
+    "#e41a1c",
+    "#377eb8",
+    "#4daf4a",
+    "#984ea3",
+    "#ff7f00",
+    "#a65628",
+    "#f781bf",
+    "#999999",
+]
+
+
+def _plot_aperture_distributions(
+    ax_frg,
+    ax_bkg,
+    img_frg,
+    img_bkg,
+    masks,
+    wl,
+    title_frg="FRG — pixel distributions per aperture",
+    title_bkg="BKG — pixel distributions per aperture",
+):
+    """Two side-by-side panels: FRG (left) and BKG (right).
+
+    All apertures are overlaid on each panel; the same colour is used for
+    the same aperture across both panels for direct comparison.  Dashed
+    vertical lines mark the per-aperture median.
+    """
+    wl_v = _wl_array(wl)
+
+    for i, mask in enumerate(masks or []):
+        color = _APERTURE_COLORS[i % len(_APERTURE_COLORS)]
+
+        _, xs = np.where(mask)
+        cx = 0.5 * (int(xs.min()) + int(xs.max())) if xs.size else 0
+        wl_c = float(wl_v[min(int(round(cx)), len(wl_v) - 1)])
+        lbl = f"{wl_c:.2f} µm"
+
+        vals_frg = img_frg[mask].ravel()
+        vals_frg = vals_frg[vals_frg > 0]  # exclude dead / zero-padded pixels
+        if vals_frg.size == 0:
+            continue
+        p1, p99 = np.nanpercentile(vals_frg, 1), np.nanpercentile(vals_frg, 99)
+        ax_frg.hist(
+            vals_frg,
+            bins=np.linspace(p1, p99, 40),
+            color=color,
+            alpha=0.55,
+            label=lbl,
+            density=True,
+            histtype="stepfilled",
+        )
+        ax_frg.axvline(
+            float(np.nanmedian(vals_frg)), color=color, lw=1.5, linestyle="--"
+        )
+
+        if img_bkg is not None and ax_bkg is not None:
+            vals_bkg = img_bkg[mask].ravel()
+            vals_bkg = vals_bkg[vals_bkg > 0]  # exclude dead / zero-padded pixels
+            if vals_bkg.size == 0:
+                continue
+            p1b, p99b = np.nanpercentile(vals_bkg, 1), np.nanpercentile(vals_bkg, 99)
+            ax_bkg.hist(
+                vals_bkg,
+                bins=np.linspace(p1b, p99b, 40),
+                color=color,
+                alpha=0.55,
+                label=lbl,
+                density=True,
+                histtype="stepfilled",
+            )
+            ax_bkg.axvline(
+                float(np.nanmedian(vals_bkg)), color=color, lw=1.5, linestyle="--"
+            )
+
+    for ax, ttl in [(ax_frg, title_frg)] + (
+        [(ax_bkg, title_bkg)] if ax_bkg is not None else []
+    ):
+        ax.set_xlabel("ADU", fontsize=8)
+        ax.set_ylabel("Density", fontsize=8)
+        ax.set_title(ttl, fontsize=9)
+        ax.legend(fontsize=7, loc="upper right")
+        ax.tick_params(labelsize=7)
+
+
 def plot(
-    ch0_frg, ch1_frg, wl_ch0, wl_ch1,
+    ch0_frg,
+    ch1_frg,
+    wl_ch0,
+    wl_ch1,
     foreground=None,
-    search_ch0=None, search_ch1=None,
-    masks_ch0=None, masks_ch1=None,
-    table_ch0=None, table_ch1=None,
-    regions_ch0=None, regions_ch1=None,
+    search_ch0=None,
+    search_ch1=None,
+    masks_ch0=None,
+    masks_ch1=None,
+    table_ch0=None,
+    table_ch1=None,
+    regions_ch0=None,
+    regions_ch1=None,
     threshold_factor=0.05,
     units="",
-    manual_wl_min_ch0=None, manual_wl_max_ch0=None,
-    manual_wl_min_ch1=None, manual_wl_max_ch1=None,
-    ch0_bkg=None, ch1_bkg=None,
-    table_ch0_bkg=None, table_ch1_bkg=None,
-    saturation_limit_ch0=None, saturation_limit_ch1=None,
+    manual_wl_min_ch0=None,
+    manual_wl_max_ch0=None,
+    manual_wl_min_ch1=None,
+    manual_wl_max_ch1=None,
+    ch0_bkg=None,
+    ch1_bkg=None,
+    table_ch0_bkg=None,
+    table_ch1_bkg=None,
+    saturation_limit_ch0=None,
+    saturation_limit_ch1=None,
     title=None,
 ):
     """Plot foreground spectra and CH0/CH1 focal planes with detected lines and apertures.
@@ -277,34 +495,74 @@ def plot(
         Background photometry tables.
     """
     import matplotlib.pyplot as plt
+    from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 
     plt.rcParams.update({"font.size": 9})
 
     has_bkg = (ch0_bkg is not None) or (ch1_bkg is not None)
 
     if has_bkg:
-        # 9 rows: spectrum | ch0-frg | ch0-frg-profile | ch0-bkg | ch0-bkg-profile
-        #                  | ch1-frg | ch1-frg-profile | ch1-bkg | ch1-bkg-profile
-        height_ratios = [2.0, 2.0, 0.6, 2.0, 0.6, 5.0, 0.8, 5.0, 0.8]
-        fig, axes = plt.subplots(9, 1, figsize=(16, 26),
-                                 gridspec_kw={"height_ratios": height_ratios})
-        (ax_spec,
-         ax_ch0, ax_ch0p, ax_ch0_bkg, ax_ch0_bkgp,
-         ax_ch1, ax_ch1p, ax_ch1_bkg, ax_ch1_bkgp) = axes
+        # outer grid: spectrum | ch0(frg,fp,bkg,bp,dist) | ch1(frg,fp,bkg,bp,dist)
+        height_ratios = [2.0, 2.0, 0.6, 2.0, 0.6, 2.2, 5.0, 0.8, 5.0, 0.8, 2.2]
+        fig = plt.figure(figsize=(16, 32))
+        gs = GridSpec(11, 1, figure=fig, height_ratios=height_ratios, hspace=0.55)
+        ax_spec = fig.add_subplot(gs[0])
+        ax_ch0 = fig.add_subplot(gs[1])
+        ax_ch0p = fig.add_subplot(gs[2])
+        ax_ch0_bkg = fig.add_subplot(gs[3])
+        ax_ch0_bkgp = fig.add_subplot(gs[4])
+        gs_ch0_dist = GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[5], wspace=0.35)
+        ax_ch0_dist_frg = fig.add_subplot(gs_ch0_dist[0, 0])
+        ax_ch0_dist_bkg = fig.add_subplot(gs_ch0_dist[0, 1])
+        ax_ch1 = fig.add_subplot(gs[6])
+        ax_ch1p = fig.add_subplot(gs[7])
+        ax_ch1_bkg = fig.add_subplot(gs[8])
+        ax_ch1_bkgp = fig.add_subplot(gs[9])
+        gs_ch1_dist = GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[10], wspace=0.35)
+        ax_ch1_dist_frg = fig.add_subplot(gs_ch1_dist[0, 0])
+        ax_ch1_dist_bkg = fig.add_subplot(gs_ch1_dist[0, 1])
+        all_single_axes = [
+            ax_spec,
+            ax_ch0,
+            ax_ch0p,
+            ax_ch0_bkg,
+            ax_ch0_bkgp,
+            ax_ch1,
+            ax_ch1p,
+            ax_ch1_bkg,
+            ax_ch1_bkgp,
+        ]
     else:
-        height_ratios = [2.0, 2.0, 0.6, 5.0, 0.8]
-        fig, axes = plt.subplots(5, 1, figsize=(16, 14),
-                                 gridspec_kw={"height_ratios": height_ratios})
-        ax_spec, ax_ch0, ax_ch0p, ax_ch1, ax_ch1p = axes
+        height_ratios = [2.0, 2.0, 0.6, 2.2, 5.0, 0.8, 2.2]
+        fig = plt.figure(figsize=(16, 22))
+        gs = GridSpec(7, 1, figure=fig, height_ratios=height_ratios, hspace=0.55)
+        ax_spec = fig.add_subplot(gs[0])
+        ax_ch0 = fig.add_subplot(gs[1])
+        ax_ch0p = fig.add_subplot(gs[2])
+        gs_ch0_dist = GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[3], wspace=0.35)
+        ax_ch0_dist_frg = fig.add_subplot(gs_ch0_dist[0, 0])
+        ax_ch0_dist_bkg = fig.add_subplot(gs_ch0_dist[0, 1])
+        ax_ch1 = fig.add_subplot(gs[4])
+        ax_ch1p = fig.add_subplot(gs[5])
+        gs_ch1_dist = GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[6], wspace=0.35)
+        ax_ch1_dist_frg = fig.add_subplot(gs_ch1_dist[0, 0])
+        ax_ch1_dist_bkg = fig.add_subplot(gs_ch1_dist[0, 1])
         ax_ch0_bkg = ax_ch0_bkgp = ax_ch1_bkg = ax_ch1_bkgp = None
+        all_single_axes = [ax_spec, ax_ch0, ax_ch0p, ax_ch1, ax_ch1p]
 
-    for a in axes:
+    for a in all_single_axes:
         a.tick_params(labelsize=8)
 
     # Foreground spectrum
     if foreground is not None:
-        ax_spec.plot(foreground["wavelength"], foreground["radiance"],
-                     color="k", label="foreground", zorder=1, lw=1)
+        ax_spec.plot(
+            foreground["wavelength"],
+            foreground["radiance"],
+            color="k",
+            label="foreground",
+            zorder=1,
+            lw=1,
+        )
         _annotate_foreground_spectrum(ax_spec, foreground)
     ax_spec.legend(fontsize=8)
     ax_spec.set_xlabel("Wavelength (µm)", fontsize=9)
@@ -312,38 +570,110 @@ def plot(
     ax_spec.set_title("Foreground Spectrum", fontsize=10)
 
     # AIRS-CH0 signal
-    _plot_channel(ax_ch0, ax_ch0p, ch0_frg, wl_ch0, search_ch0, regions_ch0,
-                  masks_ch0, table_ch0, "AIRS-CH0 FRG Focal Plane",
-                  threshold_factor, units, 'tab:orange',
-                  manual_wl_min_ch0, manual_wl_max_ch0,
-                  saturation_limit=saturation_limit_ch0)
+    _plot_channel(
+        ax_ch0,
+        ax_ch0p,
+        ch0_frg,
+        wl_ch0,
+        search_ch0,
+        regions_ch0,
+        masks_ch0,
+        table_ch0,
+        "AIRS-CH0 FRG Focal Plane",
+        threshold_factor,
+        units,
+        "tab:orange",
+        manual_wl_min_ch0,
+        manual_wl_max_ch0,
+        saturation_limit=saturation_limit_ch0,
+    )
     ax_ch0p.set_title("Horizontal profile — CH0 FRG", fontsize=9)
 
     # AIRS-CH0 background
     if ax_ch0_bkg is not None and ch0_bkg is not None:
-        _plot_channel(ax_ch0_bkg, ax_ch0_bkgp, ch0_bkg, wl_ch0, None, regions_ch0,
-                      masks_ch0, table_ch0_bkg, "AIRS-CH0 BKG Focal Plane",
-                      threshold_factor, units, 'tab:purple',
-                      manual_wl_min_ch0, manual_wl_max_ch0,
-                      saturation_limit=saturation_limit_ch0)
+        _plot_channel(
+            ax_ch0_bkg,
+            ax_ch0_bkgp,
+            ch0_bkg,
+            wl_ch0,
+            None,
+            regions_ch0,
+            masks_ch0,
+            table_ch0_bkg,
+            "AIRS-CH0 BKG Focal Plane",
+            threshold_factor,
+            units,
+            "tab:purple",
+            manual_wl_min_ch0,
+            manual_wl_max_ch0,
+            saturation_limit=saturation_limit_ch0,
+        )
         ax_ch0_bkgp.set_title("Horizontal profile — CH0 BKG", fontsize=9)
 
+    # AIRS-CH0 per-aperture distributions
+    _plot_aperture_distributions(
+        ax_ch0_dist_frg,
+        ax_ch0_dist_bkg,
+        ch0_frg,
+        ch0_bkg,
+        masks_ch0,
+        wl_ch0,
+        title_frg="CH0 — FRG pixel distributions",
+        title_bkg="CH0 — BKG pixel distributions",
+    )
+
     # AIRS-CH1 signal
-    _plot_channel(ax_ch1, ax_ch1p, ch1_frg, wl_ch1, search_ch1, regions_ch1,
-                  masks_ch1, table_ch1, "AIRS-CH1 FRG Focal Plane",
-                  threshold_factor, units, 'tab:green',
-                  manual_wl_min_ch1, manual_wl_max_ch1,
-                  saturation_limit=saturation_limit_ch1)
+    _plot_channel(
+        ax_ch1,
+        ax_ch1p,
+        ch1_frg,
+        wl_ch1,
+        search_ch1,
+        regions_ch1,
+        masks_ch1,
+        table_ch1,
+        "AIRS-CH1 FRG Focal Plane",
+        threshold_factor,
+        units,
+        "tab:green",
+        manual_wl_min_ch1,
+        manual_wl_max_ch1,
+        saturation_limit=saturation_limit_ch1,
+    )
     ax_ch1p.set_title("Horizontal profile — CH1 FRG", fontsize=9)
 
     # AIRS-CH1 background
     if ax_ch1_bkg is not None and ch1_bkg is not None:
-        _plot_channel(ax_ch1_bkg, ax_ch1_bkgp, ch1_bkg, wl_ch1, None, regions_ch1,
-                      masks_ch1, table_ch1_bkg, "AIRS-CH1 BKG Focal Plane",
-                      threshold_factor, units, 'tab:red',
-                      manual_wl_min_ch1, manual_wl_max_ch1,
-                      saturation_limit=saturation_limit_ch1)
+        _plot_channel(
+            ax_ch1_bkg,
+            ax_ch1_bkgp,
+            ch1_bkg,
+            wl_ch1,
+            None,
+            regions_ch1,
+            masks_ch1,
+            table_ch1_bkg,
+            "AIRS-CH1 BKG Focal Plane",
+            threshold_factor,
+            units,
+            "tab:red",
+            manual_wl_min_ch1,
+            manual_wl_max_ch1,
+            saturation_limit=saturation_limit_ch1,
+        )
         ax_ch1_bkgp.set_title("Horizontal profile — CH1 BKG", fontsize=9)
+
+    # AIRS-CH1 per-aperture distributions
+    _plot_aperture_distributions(
+        ax_ch1_dist_frg,
+        ax_ch1_dist_bkg,
+        ch1_frg,
+        ch1_bkg,
+        masks_ch1,
+        wl_ch1,
+        title_frg="CH1 — FRG pixel distributions",
+        title_bkg="CH1 — BKG pixel distributions",
+    )
 
     if title is not None:
         fig.suptitle(title, fontsize=12)

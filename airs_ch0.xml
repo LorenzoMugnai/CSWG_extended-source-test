@@ -154,8 +154,8 @@
 
         <add_foregrounds_to_se> True </add_foregrounds_to_se>
 
-        <qe_map_task> LoadQeMap </qe_map_task>
-        <qe_map_filename> __ConfigPath__/payload_data/qe_map.h5 </qe_map_filename>
+        <!-- <qe_map_task> LoadQeMap </qe_map_task>
+        <qe_map_filename> __ConfigPath__/payload_data/qe_map.h5 </qe_map_filename> -->
 
 <!--        ### the following are test values! ###-->
 
