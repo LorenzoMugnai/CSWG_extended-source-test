@@ -1,0 +1,37 @@
+<root>
+    <ConfigPath>/Users/spxlm4/Library/CloudStorage/Dropbox/git/Ariel-payloads/data
+        <comment>Main directory for the configuration files</comment>
+    </ConfigPath>
+    <__MPDBdata>__ConfigPath__/payload_data/surfaces/20250506_ITER_6.hdf5</__MPDBdata>
+    <__TaskFolder>__ConfigPath__/../tasks</__TaskFolder>
+    <fileName>payload_example</fileName>
+
+    <wl_grid>
+        <wl_min unit="micron">0.45</wl_min>
+        <wl_max unit="micron">8</wl_max>
+        <logbin_resolution unit="">6000</logbin_resolution>
+    </wl_grid>
+    <time_grid>
+        <start_time unit="hour">0.0</start_time>
+        <end_time unit="hour">10.0</end_time>
+        <low_frequencies_resolution unit="hour">10.0</low_frequencies_resolution>
+    </time_grid>
+
+    <pointing>
+        <ra> 22h03m10.8s </ra>
+        <dec> +18d53m04s </dec>
+    </pointing>
+
+    <!-- <jitter>
+        <jitter_task> __TaskFolder__/esaPointingJitter.py </jitter_task>
+        <filename>__ConfigPath__/payload_data/pointing_jitter_file4</filename>
+    </jitter> -->
+
+    <sky>
+        <config>sky.xml</config>
+    </sky>
+
+    <payload>
+        <config>payload.xml</config>
+    </payload>
+</root>

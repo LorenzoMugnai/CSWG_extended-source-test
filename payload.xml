@@ -1,0 +1,15 @@
+<root>
+    <fileName>payload_20250506</fileName>
+
+    <Telescope>Ariel_Tel
+        <config>ariel_telescope.xml</config>
+    </Telescope>
+
+    <channel> AIRS-CH0
+        <config>airs_ch0.xml</config>
+    </channel>
+    <channel> AIRS-CH1
+        <config>airs_ch1.xml</config>
+    </channel> 
+
+</root>

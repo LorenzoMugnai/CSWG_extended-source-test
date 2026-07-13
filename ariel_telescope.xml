@@ -1,0 +1,58 @@
+<root>
+    <Atel unit="m**2">  0.63  </Atel>
+    <optical_path>
+        <opticalElement>M1
+            <type>surface</type>
+            <task_model>LoadOpticalElementHDF5</task_model>
+            <temperature unit='K'>60</temperature>
+            <hdf5_file>__MPDBdata__</hdf5_file>
+            <group_key>ta/m1</group_key>
+            <wavelength_key>wavelength</wavelength_key>
+            <efficiency_key>reflectivity.eol</efficiency_key>
+        </opticalElement>
+
+        <opticalElement>M2
+            <type>surface</type>
+            <task_model>LoadOpticalElementHDF5</task_model>
+            <temperature unit='K'>60</temperature>
+            <hdf5_file>__MPDBdata__</hdf5_file>
+            <group_key>ta/m2</group_key>
+            <wavelength_key>wavelength</wavelength_key>
+            <emissivity_key>emissivity</emissivity_key>
+            <efficiency_key>reflectivity.eol</efficiency_key>
+        </opticalElement>
+
+        <opticalElement>M3
+            <type>surface</type>
+            <task_model>LoadOpticalElementHDF5</task_model>
+            <temperature unit='K'>60</temperature>
+            <hdf5_file>__MPDBdata__</hdf5_file>
+            <group_key>ta/m3</group_key>
+            <wavelength_key>wavelength</wavelength_key>
+            <emissivity_key>emissivity</emissivity_key>
+            <efficiency_key>reflectivity.eol</efficiency_key>
+        </opticalElement>
+
+        <opticalElement>M4
+            <type>surface</type>
+            <task_model>LoadOpticalElementHDF5</task_model>
+            <temperature unit='K'>60</temperature>
+            <hdf5_file>__MPDBdata__</hdf5_file>
+            <group_key>ta/m4</group_key>
+            <wavelength_key>wavelength</wavelength_key>
+            <emissivity_key>emissivity</emissivity_key>
+            <efficiency_key>reflectivity.eol</efficiency_key>
+        </opticalElement>
+
+        <opticalElement>M5
+            <type>surface</type>
+            <task_model>LoadOpticalElementHDF5</task_model>
+            <temperature unit='K'>60</temperature>
+            <hdf5_file>__MPDBdata__</hdf5_file>
+            <group_key>optics/m5</group_key>
+            <wavelength_key>wavelength</wavelength_key>
+            <emissivity_key>emissivity</emissivity_key>
+            <efficiency_key>reflectivity.eol</efficiency_key>
+        </opticalElement>
+    </optical_path>
+</root>

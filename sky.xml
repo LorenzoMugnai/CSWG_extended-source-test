@@ -1,0 +1,62 @@
+<root>
+
+<!--    <source> nebulae-->
+<!--            <source_type>custom</source_type>-->
+<!--            <filename>/home/lorenzo/Dropbox/Work/ARIEL/ArielRad_dataAnalysis/20210916_nebulae/IC418HRLowIon.ecsv</filename>-->
+<!--            <R unit="R_sun"> 100 </R>-->
+<!--            <D unit="pc"> 330 </D>-->
+<!--    </source>-->
+
+    <!-- <source> HD 209458
+        <source_type>planck
+        </source_type>
+        <path>. </path> -->
+
+<!--            <online_database>-->
+<!--                <url>https://exodb.space/api/v1/star</url>-->
+<!--                <x-access-tokens>eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI1M2ZhZmE3MTA1YzM3OGNiMmQ3ZDk5MTVlMmE2OWIwMDA0ZGVkMTBhNTY4ZmFkMTJjYTk0NThhZjNlZThjMDFkIiwiZXhwIjo5OTk5OTk5OTk5OTk5OTl9.uUS-8lDhJ72FI_qtu6GQQkGkS2Hpk7Fc_Y8oeJzcA7k</x-access-tokens>-->
+<!--            </online_database>-->
+
+<!--         <R unit="R_sun"> 1.17967 </R>
+        <M unit="M_sun"> 1.1753 </M>
+        <T unit="K"> 6086 </T>
+        <D unit="pc"> 47.4567 </D>
+        <z unit=""> 0.0 </z>
+
+        <ra> 22h03m10.8s </ra>
+        <dec> +18d53m04s </dec>
+    </source> -->
+
+<!--    <source> HD 209458 1-->
+<!--        <source_type> phoenix </source_type>-->
+
+<!--        <R unit="R_sun"> 1.17967 </R>-->
+<!--        <M unit="M_sun"> 1.1753 </M>-->
+<!--        <T unit="K"> 6086 </T>-->
+<!--        <D unit="pc"> 55 </D>-->
+<!--        <z unit=""> 0.0 </z>-->
+
+<!--        <ra> 22h03m10.68s </ra>-->
+<!--        <dec> +18d53m03s </dec>-->
+
+<!--    </source>-->
+
+
+
+
+    <foregrounds>
+        <opticalElement> zodiacal
+            <zodiacal_factor>2.5</zodiacal_factor>
+        </opticalElement>
+
+        <opticalElement> line
+            <task_model>LoadOpticalElement</task_model>
+            <datafile>foreground.ecsv</datafile>
+            <wavelength_key>wavelength</wavelength_key>
+            <radiance_key>radiance</radiance_key>
+            <efficiency_key>transmission</efficiency_key>
+            <isolate>True</isolate>
+        </opticalElement>
+    </foregrounds>
+
+</root>
