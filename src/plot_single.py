@@ -396,10 +396,13 @@ def _plot_aperture_distributions(
         vals_frg = vals_frg[vals_frg > 0]  # exclude dead / zero-padded pixels
         if vals_frg.size == 0:
             continue
-        p1, p99 = np.nanpercentile(vals_frg, 1), np.nanpercentile(vals_frg, 99)
+        q25, q75 = np.nanpercentile(vals_frg, [25, 75])
+        iqr = q75 - q25
+        lo_frg = max(q25 - 3.0 * iqr, vals_frg.min())
+        hi_frg = min(q75 + 3.0 * iqr, vals_frg.max())
         ax_frg.hist(
             vals_frg,
-            bins=np.linspace(p1, p99, 40),
+            bins=np.linspace(lo_frg, hi_frg, 40),
             color=color,
             alpha=0.55,
             label=lbl,
@@ -415,10 +418,13 @@ def _plot_aperture_distributions(
             vals_bkg = vals_bkg[vals_bkg > 0]  # exclude dead / zero-padded pixels
             if vals_bkg.size == 0:
                 continue
-            p1b, p99b = np.nanpercentile(vals_bkg, 1), np.nanpercentile(vals_bkg, 99)
+            q25b, q75b = np.nanpercentile(vals_bkg, [25, 75])
+            iqrb = q75b - q25b
+            lo_bkg = max(q25b - 3.0 * iqrb, vals_bkg.min())
+            hi_bkg = min(q75b + 3.0 * iqrb, vals_bkg.max())
             ax_bkg.hist(
                 vals_bkg,
-                bins=np.linspace(p1b, p99b, 40),
+                bins=np.linspace(lo_bkg, hi_bkg, 40),
                 color=color,
                 alpha=0.55,
                 label=lbl,
